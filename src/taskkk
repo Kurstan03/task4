@@ -1,0 +1,90 @@
+-- - Вывести всех клиентов из страны Canada
+
+SELECT * FROM customer WHERE country = 'Canada';
+--
+-- - Вывести все страны клиентов
+SELECT country FROM customer;
+--
+-- - Вывести количество всех заказов
+--
+SELECT count(*) AS quantity_orders FROM orders;
+
+-- - Вывести максимальную стоимость заказа
+--
+SELECT max(unit_price) as max_price FROM order_item;
+-- - Найти сумму всех заказов
+--
+SELECT count(*) AS quantity_orders FROM orders;
+--OR
+SELECT sum(unit_price) AS  sum_all_orders FROM order_item;
+
+-- - Найти сумму всех заказов за 2014 год
+--
+SELECT count(*) AS quantity_orders FROM orders WHERE extract(year from order_date ) = 2014;
+
+-- - Найти среднюю стоимость всех заказов
+--
+SELECT avg(unit_price) AS average_price FROM order_item;
+
+-- - Найти среднюю стоимость всех заказов по каждому клиенту
+--
+SELECT first_name, avg(unit_price) FROM customer JOIN orders o on customer.id = o.customer_id
+JOIN order_item oi on o.id = oi.order_id GROUP BY first_name;
+
+-- - Найти всех клиентов, которые живут в Бразилии или Испании
+--
+SELECT * FROM customer WHERE country IN ('Brazil','Spain');
+
+-- - Найти все заказы между 2013ым и 2014ым годами, которые стоили меньше 100.00$
+--
+SELECT * FROM orders JOIN order_item oi on orders.id = oi.order_id
+         WHERE order_date between '2013-1-1' AND '2013-12-31' AND unit_price < 100;
+--
+--
+-- - Найти всех клиентов, которые в одной из стран:
+-- Испания, Италия, Германия, Франция. Отсортируйте по странам
+SELECT * FROM customer WHERE country IN ('Spain', 'Italy', 'Germany', 'France') ORDER BY country;
+--
+-- - Найти все страны клиентов, страны которых содержаться в таблице поставщиков
+--
+SELECT customer.country FROM customer JOIN orders o ON customer.id = o.customer_id
+JOIN order_item oi on o.id = oi.order_id
+JOIN product p on oi.product_id = p.id
+JOIN supplier s on p.supplier_id = s.id
+WHERE customer.country = s.country;
+--
+--
+-- - Найти всех клиентов, имена которых начинаются на ‘Jo’
+SELECT *  FROM customer WHERE first_name like 'Jo%';
+--
+-- - Найти всех клиентов, имена которых заканчиваются на ‘a’ и имеют длину ровно 4 символа
+--
+SELECT *  FROM customer WHERE first_name like '%a' and first_name like '____';
+--
+--
+-- - Найти количество клиентов по странам
+SELECT country, count(*) FROM customer group by country;
+--
+-- - Найти количество клиентов по странам. Вывести в порядке убывания
+--
+SELECT country, count(*) FROM customer group by country order by count(*) desc;
+--
+--
+-- - Найти общую сумму стоимости заказов и количество заказов по каждому клиенту (customer_id).
+-- Отсортировать по сумме
+SELECT orders.customer_id, sum(oi.unit_price), count(orders) FROM orders
+JOIN order_item oi on orders.id = oi.order_id
+GROUP BY customer_id ORDER BY sum(oi.unit_price);
+--
+-- - Найти общую сумму стоимости заказов и количество заказов по каждому клиенту (customer_id),
+-- у которых общее количество заказов больше 20ти
+--
+SELECT orders.customer_id, sum(oi.unit_price), count(orders) FROM orders
+JOIN order_item oi on orders.id = oi.order_id
+WHERE count(orders) > 20
+GROUP BY customer_id;
+
+--
+--
+-- - Найти количество городов в каждой из стран клиентов
+SELECT country, count(city) FROM customer GROUP BY country;
